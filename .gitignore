@@ -1,0 +1,26 @@
+# کلید API — هرگز نباید وارد گیت شود (به config.py.example نگاه کنید)
+config.py
+
+# داده‌های محلی کاربر (تایمرها، گیاهان سفارشی، ترجیحات) — این فایل‌ها
+# فقط روی خودِ گوشی/دستگاه تست ساخته و به‌روزرسانی می‌شوند
+plant_care_data.json
+custom_plants.json
+timers_data.json
+
+# خروجی بیلد
+.buildozer/
+bin/
+*.apk
+
+# پایتون
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# فایل‌های سیستم‌عامل/ویرایشگر
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,24 @@
+# -*- coding: utf-8 -*-
+"""
+نمونه‌ی config.py — این فایل امن است و می‌تواند در گیت پابلیک قرار بگیرد
+(چون هیچ کلید واقعی‌ای داخلش نیست).
+
+نحوه‌ی استفاده:
+  ۱. یک کپی از این فایل با نام دقیق «config.py» در همین پوشه بسازید.
+  ۲. مقدار DEEPSEEK_API_KEY را با کلید واقعی خودتان از
+     https://platform.deepseek.com پر کنید.
+  ۳. فایل config.py (نه این فایل) از قبل در .gitignore است، پس با git push
+     شما به گیت‌هاب فرستاده نمی‌شود — نیازی به کار اضافه نیست.
+
+جزئیات بیشتر (و راه امن‌تر با پراکسی Cloudflare برای انتشار عمومی) در
+docstring بالای config.py و در server/README.md.
+"""
+
+DEEPSEEK_API_KEY = ""
+DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
+
+PROXY_URL = ""
+APP_SHARED_SECRET = ""
+
+VISION_MODEL = "deepseek-v4-flash-vision-exp"
+TEXT_MODEL = "deepseek-v4-flash"

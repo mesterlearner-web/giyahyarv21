@@ -1,0 +1,70 @@
+# این فایل، APK اپ گیاهیار را به‌صورت خودکار روی سرورهای گیت‌هاب می‌سازد
+# (نه روی سیستم شما) - چون بیلد کیوی نیاز به Android SDK/NDK و مقدار
+# زیادی فضا و زمان دارد. هر بار که به شاخه اصلی push کنید، یک بیلد جدید
+# اجرا می‌شود؛ همچنین می‌توانید از تب Actions در گیت‌هاب دستی هم اجرایش کنید.
+#
+# نتیجه (فایل APK) را از تب Actions → روی آخرین اجرا کلیک کنید →
+# پایین صفحه، بخش Artifacts دانلود کنید.
+#
+# نکته مهم: buildozer.spec باید در ریشه‌ی همین ریپازیتوری باشد (یعنی وقتی
+# پروژه را به گیت‌هاب push می‌کنید، محتوای پوشه plant_care_app را مستقیم
+# در ریشه‌ی ریپو بگذارید، نه خودِ پوشه را با یک لایه اضافه).
+#
+# نصب Buildozer را اینجا مستقیم و شفاف انجام می‌دهیم (نه از طریق یک اکشن
+# آماده‌ی شخص ثالث) تا کنترل کامل روی نسخه‌ی ابزارهای سیستمی (autoconf,
+# libtool و...) داشته باشیم؛ نبودِ نسخه‌ی درست همین ابزارها باعث خطای
+# «possibly undefined macro: LT_SYS_SYMBOL_USCORE» هنگام ساخت libffi می‌شد.
+
+"on":
+  push:
+  workflow_dispatch:  # اجرای دستی از تب Actions
+
+jobs:
+  build-android:
+    name: ساخت APK با Buildozer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout کد پروژه
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: نصب پیش‌نیازهای سیستمی (لیست رسمی + libltdl-dev برای libffi)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git zip unzip openjdk-17-jdk \
+            python3-pip python3-virtualenv \
+            autoconf automake libtool libltdl-dev pkg-config \
+            zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo6 \
+            cmake libffi-dev libssl-dev \
+            autopoint gettext
+
+      - name: نصب Buildozer
+        run: pip install --upgrade buildozer cython
+
+      - name: ساخت config.py از GitHub Secrets (اختیاری)
+        # config.py عمداً در .gitignore است تا کلید هیچ‌وقت وارد ریپازیتوری
+        # نشود، پس این‌جا باید قبل از بیلد از نو ساخته شود. اگر Secretهای
+        # زیر را تنظیم نکرده باشید (Settings → Secrets and variables →
+        # Actions)، بیلد باز هم موفق می‌شود؛ فقط اپ در صفحه‌ی دستیار هوشمند
+        # پیام «نیاز به تنظیم» نشان می‌دهد. جزئیات: server/README.md
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          PROXY_URL: ${{ secrets.PROXY_URL }}
+          APP_SHARED_SECRET: ${{ secrets.APP_SHARED_SECRET }}
+        run: python3 scripts/generate_config.py
+
+      - name: بیلد با Buildozer
+        run: buildozer -v android debug
+
+      - name: آپلود APK به‌عنوان artifact قابل‌دانلود
+        uses: actions/upload-artifact@v4
+        with:
+          name: giyahyar-apk
+          path: bin/*.apk
+          if-no-files-found: error
